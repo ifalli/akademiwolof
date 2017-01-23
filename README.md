@@ -1,0 +1,2 @@
+# akademiwolof
+wolof multilingual project
