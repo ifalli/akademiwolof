@@ -79,7 +79,7 @@ public class WordTests {
 		//init();
 		
 		boolean isOk = false;
-		String myFile = "src/test/java/org/akaademiwolof/testfiles/gag.xlsx";
+		String myFile = "src/test/java/org/akaademiwolof/testfiles/gag_cut.xlsx";
 		File f = new File(myFile);
 		if(f.exists() && !f.isDirectory()) { 
 			isOk = importDataService.importDataFromFile(myFile);
