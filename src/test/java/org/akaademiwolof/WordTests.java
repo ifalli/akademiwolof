@@ -17,8 +17,19 @@ package org.akaademiwolof;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.akaademiwolof.common.ReadExcellFile;
+import org.akaademiwolof.common.RowObject;
+import org.akaademiwolof.entity.Definition;
+import org.akaademiwolof.entity.Example;
+import org.akaademiwolof.entity.Language;
+import org.akaademiwolof.entity.WordSens;
+import org.akaademiwolof.entity.WordType;
+import org.akaademiwolof.manager.SearchManager;
+import org.akaademiwolof.serviceInterface.ImportDataService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +38,6 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import org.akaademiwolof.MainConfiguration;
-import org.akaademiwolof.entity.Definition;
-import org.akaademiwolof.entity.Example;
-import org.akaademiwolof.entity.Language;
-import org.akaademiwolof.entity.WordSens;
-import org.akaademiwolof.entity.WordType;
-import org.akaademiwolof.manager.SearchManager;
 /**
  * Basic integration tests for service demo application.
  *
@@ -53,6 +56,39 @@ public class WordTests {
 	
 	@Autowired
 	SearchManager searchManager;
+	
+	@Autowired
+	ImportDataService importDataService;
+
+	
+	@Test
+	public void readFileTest() throws IOException
+	{
+		 String myFile = "C://Users//sdieng//Desktop//gag.xlsx";
+		 
+		 List<RowObject>  lineList = ReadExcellFile.parseFile(myFile);
+              
+		 assertThat(lineList).isNotEmpty();
+	}
+
+	
+	
+	@Test
+	public void importDataFromFileTest(){		
+		
+		//init();
+		
+		boolean isOk = false;
+		String myFile = "src/test/java/org/akaademiwolof/testfiles/gag.xlsx";
+		File f = new File(myFile);
+		if(f.exists() && !f.isDirectory()) { 
+			isOk = importDataService.importDataFromFile(myFile);
+		}
+		
+		assertThat(isOk).isTrue();
+		
+	}
+	
 
 	@Test
 	public void crudTest(){
@@ -60,8 +96,10 @@ public class WordTests {
 		//WordSens wordSens = createWordSens();
 		List<WordSens> ws = (List<WordSens>) searchManager.getWordSenseService().findAll();
 		//WordSens ws =  searchManager.getWordSenseService().findByWord("Paaka");
-		assertThat(ws).isNotNull();
+
 	}
+	
+	
 	public WordSens createWordSens(){
 		
 		Example ex = new Example();
