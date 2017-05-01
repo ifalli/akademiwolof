@@ -1,4 +1,4 @@
-# akademiwolof
+# Gaggantikaay
 This project is sostained by senegalese association named Akaademi wolof.
 the main gol is to build a complete online multilingual dictionary.
 I and other members of the association mainly build the application and the web site
