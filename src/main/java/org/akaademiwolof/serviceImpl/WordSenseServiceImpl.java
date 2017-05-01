@@ -1,6 +1,7 @@
 package org.akaademiwolof.serviceImpl;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import org.akaademiwolof.Dao.WordSenseRepository;
 import org.akaademiwolof.entity.WordSens;
@@ -22,5 +23,20 @@ public class WordSenseServiceImpl extends GenericServiceImpl<WordSens, BigIntege
 	@Override
 	public WordSens findByWord(String word) {
 		return wordSenseRepository.findByWord(word);
+	}
+
+	@Override
+	public List<WordSens> findListWordsbyName(String word, String lang) {
+		return wordSenseRepository.findListWordsbyName(word, lang);
+	}
+
+	@Override
+	public List<String> findListNamebyName(String word, String lang, int limit) {
+		return wordSenseRepository.findListNamebyName(word, lang,limit);
+	}
+
+	@Override
+	public List<String> findListRangNamebyName(String word, String lang, int up, int down) {
+		return wordSenseRepository.findListRangNamebyName(word, lang, up, down);
 	}
 }

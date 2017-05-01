@@ -2,6 +2,9 @@ package org.akaademiwolof.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,7 +15,6 @@ import java.util.List;
  */
 @Entity
 @Table(name="wordType")
-@NamedQuery(name="WordType.findAll", query="SELECT w FROM WordType w")
 public class WordType implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -24,11 +26,10 @@ public class WordType implements Serializable {
 	@Column(length=45)
 	private String type;
 
-	//bi-directional many-to-one association to WordSens
 	@OneToMany(mappedBy="wordType", fetch=FetchType.LAZY)
+	@JsonIgnore
 	private List<WordSens> wordSenses;
 
-	//bi-directional many-to-one association to Language
 	@ManyToOne
 	@JoinColumn(name="idlanguage")
 	private Language language;

@@ -5,6 +5,11 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.Cascade;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 
 /**
  * Ibrahima Fall
@@ -12,7 +17,6 @@ import org.hibernate.annotations.Cascade;
  */
 @Entity
 @Table(name="example")
-@NamedQuery(name="Example.findAll", query="SELECT e FROM Example e")
 public class Example implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -24,10 +28,10 @@ public class Example implements Serializable {
 	@Column(length=45)
 	private String example;
 
-	//bi-directional many-to-many association to WordSens
-	@ManyToOne()
-	@JoinColumn(name="wordSense") 
-	private WordSens wordSenses; 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="definition") 
+	@JsonIgnore
+	private Definition definition; 
 
 	public Example() {
 	}
@@ -51,12 +55,11 @@ public class Example implements Serializable {
 		this.example = example;
 	}
 
-	public WordSens getWordSenses() {
-		return this.wordSenses;
+	public Definition getDefinition() {
+		return definition;
 	}
 
-	public void setWordSenses(WordSens wordSenses) {
-		this.wordSenses = wordSenses;
+	public void setDefinition(Definition definition) {
+		this.definition = definition;
 	}
-
 }

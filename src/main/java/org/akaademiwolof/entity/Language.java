@@ -2,6 +2,9 @@ package org.akaademiwolof.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,7 +15,6 @@ import java.util.List;
  */
 @Entity
 @Table(name="language")
-@NamedQuery(name="Language.findAll", query="SELECT l FROM Language l")
 public class Language implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -24,9 +26,11 @@ public class Language implements Serializable {
 	@Column(length=3)
 	private String name;
 
+	@JsonIgnore
 	@OneToMany(mappedBy="language", fetch=FetchType.LAZY)
 	private List<WordSens> wordSenses;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="language", fetch=FetchType.LAZY)
 	private List<WordType> wordTypes;
 
@@ -102,6 +106,5 @@ public class Language implements Serializable {
 		return wordType;
 	}
 	
-
-
+	
 }

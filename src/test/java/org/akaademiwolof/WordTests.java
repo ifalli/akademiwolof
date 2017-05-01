@@ -30,6 +30,7 @@ import org.akaademiwolof.entity.WordSens;
 import org.akaademiwolof.entity.WordType;
 import org.akaademiwolof.manager.SearchManager;
 import org.akaademiwolof.serviceInterface.ImportDataService;
+import org.hibernate.Hibernate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 /**
- * Basic integration tests for service demo application.
  *
  * @author Ibrahima Fall
  */
@@ -61,25 +61,25 @@ public class WordTests {
 	ImportDataService importDataService;
 
 	
-	@Test
+	//@Test
 	public void readFileTest() throws IOException
 	{
-		 String myFile = "C://Users//sdieng//Desktop//gag.xlsx";
+		 String myFile = "src/test/java/org/akaademiwolof/testfiles/complete.xlsx";
 		 
 		 List<RowObject>  lineList = ReadExcellFile.parseFile(myFile);
-              
+         
 		 assertThat(lineList).isNotEmpty();
 	}
 
 	
 	
-	@Test
+	//@Test
 	public void importDataFromFileTest(){		
 		
 		//init();
 		
 		boolean isOk = false;
-		String myFile = "src/test/java/org/akaademiwolof/testfiles/gag_cut.xlsx";
+		String myFile = "src/test/java/org/akaademiwolof/testfiles/complete.xlsx";
 		File f = new File(myFile);
 		if(f.exists() && !f.isDirectory()) { 
 			isOk = importDataService.importDataFromFile(myFile);
@@ -88,43 +88,51 @@ public class WordTests {
 		assertThat(isOk).isTrue();
 		
 	}
-	
-
 	@Test
-	public void crudTest(){
-		
-		//WordSens wordSens = createWordSens();
-		List<WordSens> ws = (List<WordSens>) searchManager.getWordSenseService().findAll();
+	public void initDbTest() throws IOException{
+		List<RowObject> lineList = readFileCreateRowObject();
+		importDataService.addwordsToDb(lineList);
+		assertThat(lineList.size() > 0);
+	}
+	
+	//@Test
+	public void crudTest() throws IOException{
+
 		//WordSens ws =  searchManager.getWordSenseService().findByWord("Paaka");
-
+		
+		//List<WordSens> ws = (List<WordSens>) searchManager.getWordSenseService().findListWordsbyName("ca", "Wo");
+		
+		//List<String> w = (List<String>) searchManager.getWordSenseService().findListRangNamebyName("bijji", "Wo",4,4);
+		//assertThat(w.size() > 0);
+		
+		List<WordSens> allwords = (List<WordSens>) searchManager.getWordSenseService().findAll();
+		WordSens ws = createWordsensRelations(allwords);
+		assertThat(ws.getSynonyms().size() > 0 );
+		
 	}
 	
+	public WordSens createWordsensRelations(List<WordSens> allwords){
+		
+		WordSens ws = searchManager.getWordSenseService().findByWord("bijji");
+		
+		if(ws != null){
+			ws.getSynonyms().add(allwords.get(3));
+			ws.getAntonyms().add(allwords.get(2));
+			ws.getSeeAlso().add(allwords.get(1));
+			ws.getDerivated().add(allwords.get(0));
+			searchManager.getWordSenseService().save(ws); // makes update
+		}
+		return ws;
+	}	
 	
-	public WordSens createWordSens(){
-		
-		Example ex = new Example();
-		ex.setExample("jox ma paaka bi ma dagg mburu mi");
-		
-		Language lang = searchManager.getLanguageService().findByName("Wo");
-		
-		WordType tur = searchManager.getWordTypeService().findByType("Tur");
-		
-		Definition definition = new Definition();
-		definition.setDefinition("Jumtukaay booy daggee am mbir");
-		
-		WordSens wordSens = new WordSens();
-		definition.setWordSenses(wordSens);
-		ex.setWordSenses(wordSens);
-		
-		wordSens.getExamples().add(ex);
-		wordSens.setLanguage(lang);
-		wordSens.setWordType(tur);
-		wordSens.getDefinition().add(definition);
-		wordSens.setWord("Paaka");
-		searchManager.getWordSenseService().save(wordSens);
-		return wordSens;
+	public List<RowObject> readFileCreateRowObject() throws IOException
+	{	String myFile = "src/test/java/org/akaademiwolof/testfiles/complete.xlsx";
+		 
+		List<RowObject>  lineList = ReadExcellFile.parseFile(myFile);
+              
+		return lineList;
 	}
-
+	
 	public void createType(String type,Language lang){
 		WordType wordType= new WordType(type,lang);
 		searchManager.getWordTypeService().save(wordType);		

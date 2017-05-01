@@ -4,6 +4,13 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -15,7 +22,6 @@ import java.util.List;
  */
 @Entity
 @Table(name="definitions")
-@NamedQuery(name="Definition.findAll", query="SELECT d FROM Definition d")
 public class Definition implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -31,6 +37,10 @@ public class Definition implements Serializable {
 	@JoinColumn(name="idwordSenses")
 	private WordSens wordSenses;
 
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy="definition", cascade = CascadeType.ALL,orphanRemoval=true)
+	private List<Example> examples ;
+	
 	public Definition() {
 	}
 	
@@ -60,6 +70,14 @@ public class Definition implements Serializable {
 
 	public void setWordSenses(WordSens wordSenses) {
 		this.wordSenses = wordSenses;
+	}
+
+	public List<Example> getExamples() {
+		return examples;
+	}
+
+	public void setExamples(List<Example> examples) {
+		this.examples = examples;
 	}
 
 }

@@ -1,10 +1,20 @@
 package org.akaademiwolof.entity;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+
 import javax.persistence.*;
 
+import org.akaademiwolof.domain.CustomListSerializer;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,7 +27,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="wordSenses")
-@NamedQuery(name="WordSens.findAll", query="SELECT w FROM WordSens w")
+@JsonIdentityInfo(property="@id", generator=ObjectIdGenerators.IntSequenceGenerator.class)
 public class WordSens implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -38,14 +48,29 @@ public class WordSens implements Serializable {
 	private WordType wordType;
 	
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy="wordSenses", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy="wordSenses", cascade = CascadeType.ALL,orphanRemoval=true)
 	private List<Definition>  definition ;
 	
-	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy="wordSenses", cascade = CascadeType.ALL)
-	private List<Example>  examples ;
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany()
+	@JoinTable(
+		name="roots"
+		, joinColumns={
+			@JoinColumn(name="idwordSenses2", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="idwordSenses1", nullable=false)
+			}
+		)
+	@JsonSerialize(using = CustomListSerializer.class)
+	private List<WordSens> root;
+
+	@ManyToMany(mappedBy="root")
+	@JsonIgnore
+	private List<WordSens> wordSensesroot;
+	
 		
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(
 		name="antonyms"
@@ -56,13 +81,15 @@ public class WordSens implements Serializable {
 			@JoinColumn(name="idwordSenses1", nullable=false)
 			}
 		)
+	@JsonSerialize(using = CustomListSerializer.class)
 	private List<WordSens> antonyms;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany(mappedBy="antonyms")
+	@JsonIgnore
 	private List<WordSens> wordSensesAntonym;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(
 		name="derivated"
@@ -73,12 +100,15 @@ public class WordSens implements Serializable {
 			@JoinColumn(name="idwordSenses1", nullable=false)
 			}
 		)
+	@JsonSerialize(using = CustomListSerializer.class)
 	private List<WordSens> derivated;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany(mappedBy="derivated")
+	@JsonIgnore
 	private List<WordSens> wordSensesDerivated;
 
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(
 		name="seeAlso"
@@ -89,13 +119,15 @@ public class WordSens implements Serializable {
 			@JoinColumn(name="idwordSenses1", nullable=false)
 			}
 		)
+	@JsonSerialize(using = CustomListSerializer.class)
 	private List<WordSens> seeAlso;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany(mappedBy="seeAlso")
+	@JsonIgnore
 	private List<WordSens> wordSensesSeeAlso;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany()
 	@JoinTable(
 		name="synonyms"
@@ -106,17 +138,81 @@ public class WordSens implements Serializable {
 			@JoinColumn(name="idwordSenses1", nullable=false)
 			}
 		)
+	@JsonSerialize(using = CustomListSerializer.class)
 	private List<WordSens> synonyms;
 
-	@LazyCollection(LazyCollectionOption.FALSE)
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToMany(mappedBy="synonyms")
+	@JsonIgnore
 	private List<WordSens> wordSensesSynonyms;
 
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany()
+	@JoinTable(
+		name="wo_fr"
+		, joinColumns={
+			@JoinColumn(name="idwordSenses2", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="idwordSenses1", nullable=false)
+			}
+		)
+	@JsonSerialize(using = CustomListSerializer.class)
+	private List<WordSens> woFr;
+
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany(mappedBy="woFr")
+	@JsonIgnore
+	private List<WordSens> wordSenseswoFr;
+
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany()
+	@JoinTable(
+		name="wo_en"
+		, joinColumns={
+			@JoinColumn(name="idwordSenses2", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="idwordSenses1", nullable=false)
+			}
+		)
+	@JsonSerialize(using = CustomListSerializer.class)
+	private List<WordSens> woEn;
+
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany(mappedBy="woEn")
+	@JsonIgnore
+	private List<WordSens> wordSenseswoEn;
+	
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany()
+	@JoinTable(
+		name="wo_ar"
+		, joinColumns={
+			@JoinColumn(name="idwordSenses2", nullable=false)
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="idwordSenses1", nullable=false)
+			}
+		)
+	@JsonSerialize(using = CustomListSerializer.class)
+	private List<WordSens> woAr;
+
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToMany(mappedBy="woAr")
+	@JsonIgnore
+	private List<WordSens> wordSenseswoAr;
+	
 	public WordSens() {
-		examples= new ArrayList<Example>();
+		//examples= new ArrayList<Example>();
 		definition = new ArrayList<Definition>();
 	}
 
+	public WordSens(String word, Language l) {
+		this.language = l;
+		this.word = word;
+	}
+	
 	public BigInteger getIdwordSenses() {
 		return this.idwordSenses;
 	}
@@ -133,13 +229,13 @@ public class WordSens implements Serializable {
 		this.word = word;
 	}
 
-	public List<Example> getExamples() {
-		return this.examples;
-	}
-
-	public void setExamples(List<Example> examples) {
-		this.examples = examples;
-	}
+//	public List<Example> getExamples() {
+//		return this.examples;
+//	}
+//
+//	public void setExamples(List<Example> examples) {
+//		this.examples = examples;
+//	}
 
 	public Language getLanguage() {
 		return this.language;
@@ -228,6 +324,84 @@ public class WordSens implements Serializable {
 	public void setWordSensesDerivated(List<WordSens> wordSensesDerivated) {
 		this.wordSensesDerivated = wordSensesDerivated;
 	}
-
 	
+	public List<WordSens> getRoot() {
+		return root;
+	}
+
+	public void setRoot(List<WordSens> root) {
+		this.root = root;
+	}
+
+	public List<WordSens> getWoFr() {
+		return woFr;
+	}
+
+	public void setWoFr(List<WordSens> woFr) {
+		this.woFr = woFr;
+	}
+
+	public List<WordSens> getWordSenseswoFr() {
+		return wordSenseswoFr;
+	}
+
+	public void setWordSenseswoFr(List<WordSens> wordSenseswoFr) {
+		this.wordSenseswoFr = wordSenseswoFr;
+	}
+
+	public List<WordSens> getWoEn() {
+		return woEn;
+	}
+
+	public void setWoEn(List<WordSens> woEn) {
+		this.woEn = woEn;
+	}
+
+	public List<WordSens> getWordSenseswoEn() {
+		return wordSenseswoEn;
+	}
+
+	public void setWordSenseswoEn(List<WordSens> wordSenseswoEn) {
+		this.wordSenseswoEn = wordSenseswoEn;
+	}
+
+	public List<WordSens> getWoAr() {
+		return woAr;
+	}
+
+	public void setWoAr(List<WordSens> woAr) {
+		this.woAr = woAr;
+	}
+
+	public List<WordSens> getWordSenseswoAr() {
+		return wordSenseswoAr;
+	}
+
+	public void setWordSenseswoAr(List<WordSens> wordSenseswoAr) {
+		this.wordSenseswoAr = wordSenseswoAr;
+	}
+
+	@Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (idwordSenses != null ? idwordSenses.hashCode() : 0);
+        return hash;
+    }
+	
+	@Override
+    public boolean equals(Object object) {
+        if (!(object instanceof WordSens)) {
+            return false;
+        }
+        WordSens other = (WordSens) object;
+        if ((this.idwordSenses == null && other.idwordSenses != null) || (this.idwordSenses != null && !this.idwordSenses.equals(other.idwordSenses))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "entity.User[ word=" + word + " ]";
+    }
 }

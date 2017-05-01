@@ -3,6 +3,7 @@ package org.akaademiwolof.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +19,7 @@ public final class ReadExcellFile  {
 	{
 		File myFile = new File(filename);
         FileInputStream fis = new FileInputStream(myFile);
-
+        String code = System.getProperty("file.encoding");
         // Finds the workbook instance for XLSX file
         XSSFWorkbook myWorkBook = new XSSFWorkbook (fis);
        
@@ -60,11 +61,14 @@ public final class ReadExcellFile  {
 	                     break;
 	                 default :              
                 }
-                
+                if(wrd.startsWith(" "))
+                	wrd = wrd.substring(1);
                 words.add(wrd);                 
                 
             }
-            lineList.add(fillRowObject(words));
+            
+            if(words.size() > 0 && words.get(0) != null && !words.get(0).isEmpty())
+            	lineList.add(fillRowObject(words));
         } 
         
         return lineList;
@@ -77,15 +81,43 @@ public final class ReadExcellFile  {
 		try {		
 			ro.setWord(words.get(0));
 			ro.setType(words.get(1));
-			ro.setRoot(words.get(2));
+			
+			for(String ex : words.get(2).split(",") ){
+				ro.getRoot().add(ex);
+			}
+			
 			ro.setSense(words.get(3));
-			ro.setExample(words.get(4));
-			ro.setSeeAlso(words.get(5));
-			ro.setSynonym(words.get(6));
-			ro.setAntonym(words.get(7));
-			ro.setFrench(words.get(8));
-			ro.setEnglish(words.get(9));
-			ro.setArabic(words.get(10));
+			
+			
+			for(String ex : words.get(4).split(",") ){
+				ro.getExamples().add(ex);
+			}
+			
+			for(String see : words.get(5).split(",") ){
+				ro.getSeeAlso().add(see);
+			}
+			
+			
+			for(String sy : words.get(6).split(",") ){
+				ro.getSynonyms().add(sy);
+			}
+			
+			for(String an : words.get(7).split(",") ){
+				ro.getAntonyms().add(an);
+			}
+			
+			for(String fr : words.get(8).split(",") ){
+				ro.getFrench().add(fr);
+			}
+			
+			for(String en : words.get(9).split(",") ){
+				ro.getEnglish().add(en);
+			}
+			
+			for(String ar : words.get(10).split(",") ){
+				ro.getArabic().add(ar);
+			}
+			
 		}catch (Exception ex ){
 			System.out.print("eror during this op");
 		}		

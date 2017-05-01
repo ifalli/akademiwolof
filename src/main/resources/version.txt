@@ -1,0 +1,16 @@
+0.10.0
+	1. setRelationship for root importDataFromFile.relationship
+		improvements for parsing words fron excel file 
+	2. @JoinTable(
+		name="root") in wordsens and new table roots in db
+	3. RowObject, from String root to List<String> root 
+	4. ReadExcellFile.parseFile
+	5. added this files for test: gaggantikaay.html, request.js, style.css
+	6. WordSenseServiceImpl.findListNamebyName
+			sql query is changed
+	7. the database schema is changed
+			example point to definitions. one definition many example
+	8. method to write excel row in RowObject is changed
+			ReadExcellFile.fillRowObject()
+	
+0.9.1
